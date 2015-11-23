@@ -1,32 +1,31 @@
-{-# LANGUAGE ViewPatterns #-}
-import Data.List
+data Tree = Leaf Char | Branch Tree Tree
 
-binaryTree = "**B**DECA"
-input = "10110101"
+main :: IO ()
+main = interact (unlines . showResult . readTestCase . lines)
 
---  B   00
---  D   0100
---  E   0101
---  C   011
---  A   1
+readTestCase :: [String] -> (String, [String])
+readTestCase (x:lx) = (x, lx)
+readTestCase _ =  error "The input must be more than one line."
 
-getLetterIndices preOrder@('*':_) encoding = self 1 "0" ++ self 2 "1"
-    where self d b = getLetterIndices (drop d preOrder) (encoding ++ b)
+showResult :: (String, [String]) -> [String]
+showResult (encoding, messages) = map (decodeMessage encodingTree) messages
+    where (_, encodingTree) =  (encodeTree encoding)
 
-getLetterIndices preOrder encoding = [(encoding)]
+encodeTree :: String -> (String, Tree)
+encodeTree ('*':encoding)  =
+    let (encodingLeft, left)  = encodeTree encoding
+        (encodingRight, right) = encodeTree (tail encodingLeft)
+    in (encodingRight, Branch left right)
+encodeTree (encoding)  = (encoding, Leaf (head encoding))
 
-getEncodings preOrder = zip encodings starStripped
-    where
-        starStripped = filter (/= '*') preOrder
-        encodings = getLetterIndices preOrder []
+decodeChar :: String -> Tree -> (Char, String)
+decodeChar rest     (Leaf c)         = (c, rest)
+decodeChar ('0':xb) (Branch left _)  = decodeChar xb left
+decodeChar ('1':xb) (Branch _ right) = decodeChar xb right
+decodeChar _  _ = error "Either the message or the encoding is corrupted."
 
-
-myFunc (stripPrefix "toaster" -> Just _) = "toaster"
-myFunc _ = "not a toaster"
-
-decode encoded encodings decoded = map (decode encoded encodings decoded)
--- decode "01010101" [("00",'B'),("0100",'D')]
---test pat a = subtest pat a
---    where
---        subtest _ (stripPrefix pat -> Just _) = "Pattern matchies"
---        subtest _ _       = "Do not match"
+decodeMessage :: Tree -> String -> String
+decodeMessage _ []      = []
+decodeMessage tree message =
+    let (c, rest) = decodeChar message tree
+    in c:decodeMessage tree rest
