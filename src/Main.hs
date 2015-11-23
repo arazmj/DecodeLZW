@@ -5,7 +5,7 @@ main = interact (unlines . showResult . readTestCase . lines)
 
 readTestCase :: [String] -> (String, [String])
 readTestCase (x:lx) = (x, lx)
-readTestCase _     =  error "Input must be more than 1 line."
+readTestCase _ =  error "The input must be more than one line."
 
 showResult :: (String, [String]) -> [String]
 showResult (encoding, messages) = map (decodeMessage encodingTree) messages
@@ -22,7 +22,7 @@ decodeChar :: String -> Tree t -> (Char, String)
 decodeChar rest     (Leaf c)         = (c, rest)
 decodeChar ('0':xb) (Branch left _)  = decodeChar xb left
 decodeChar ('1':xb) (Branch _ right) = decodeChar xb right
-decodeChar _  _                      = error "The encoding is for the message: "
+decodeChar _  _ = error "Either the message or the encoding is corrupted."
 
 decodeMessage :: Tree t -> String -> String
 decodeMessage _ []      = []
