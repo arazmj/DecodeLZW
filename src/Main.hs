@@ -1,3 +1,10 @@
+{-
+ - Author: Amir Razmjou, arazmjou2014@my.fit.edu
+ - Author: Benjamin Yue, 246810ben@gmail.com
+ - Course: CSE 4250, Fall 2015
+ - Project: Proj3, Decoding Text
+ -}
+
 data Tree = Leaf Char | Branch Tree Tree
 
 main :: IO ()
@@ -12,11 +19,11 @@ showResult (encoding, messages) = map (decodeMessage encodingTree) messages
     where (_, encodingTree) =  (encodeTree encoding)
 
 encodeTree :: String -> (String, Tree)
-encodeTree ('*':encoding)  =
-    let (encodingLeft, left)  = encodeTree encoding
+encodeTree ('*':encoding) =
+    let (encodingLeft, left)   = encodeTree encoding
         (encodingRight, right) = encodeTree (tail encodingLeft)
     in (encodingRight, Branch left right)
-encodeTree (encoding)  = (encoding, Leaf (head encoding))
+encodeTree (encoding)          = (encoding, Leaf (head encoding))
 
 decodeChar :: String -> Tree -> (Char, String)
 decodeChar rest     (Leaf c)         = (c, rest)
