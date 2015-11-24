@@ -1,6 +1,6 @@
 {-
  - Author: Amir Razmjou, arazmjou2014@my.fit.edu
- - Author: Benjamin Yue, 246810ben@gmail.com
+ - Author: Benjamin Yue, byue2013@my.fit.edu
  - Course: CSE 4250, Fall 2015
  - Project: Proj3, Decoding Text
  -}
