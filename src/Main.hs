@@ -14,9 +14,9 @@ main = interact (unlines . showResult . readTestCase . lines)
 -- | seperate the first line (encoding string ) from the rest
 -- of lines (encoded messages). Rises an error if there is no
 -- more than a line.
-readTestCase :: [String]            -- ^ List of all input strings
-             -> (String, [String])  -- ^ Encoding string,
-                                    -- encoded messages
+readTestCase :: [String]           -- ^ List of input strings
+             -> (String, [String]) -- ^ Encoding string,
+                                   -- encoded messages
 readTestCase (x:lx) = (x, lx)
 readTestCase _ =  error "The input must be more than one line."
 
