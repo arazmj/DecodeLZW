@@ -29,7 +29,7 @@ showResult (encoding, messages) =
     where (_, encodingTree) =  (encodeTree encoding)
 
 -- | constructs the encoding tree from encoding string
--- parses encoding tree recursivly for on left and right
+-- parses encoding tree recursively for on left and right
 -- string but only passes to the left branch the unparsed
 -- part of by right branch, to pass the state to left
 -- branch.
@@ -42,8 +42,8 @@ encodeTree ('*':encoding) =
 encodeTree (encoding)  = (encoding, Leaf (head encoding))
 
 
--- | traverse the encoded string with the the encoding tree
--- until it reaches a leaf, returns the leaf (decoded char)
+-- | traverses the encoded string with the the encoding tree
+-- until it reaches a leaf. Returns the leaf (decoded char)
 -- and the remaining encoded string that was not part of the
 -- path. Also rises an error when there is encoding symbols
 -- other than '0' or '1' or there is part of the encoded
