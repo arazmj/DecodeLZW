@@ -11,16 +11,16 @@ data Tree = Leaf Char | Branch Tree Tree
 main :: IO ()
 main = interact (unlines . showResult . readTestCase . lines)
 
--- | seperate the first line (encoding string ) from the rest
+-- | Seperates the first line (encoding string ) from the rest
 -- of lines (encoded messages). Rises an error if there is no
 -- more than a line.
 readTestCase :: [String]           -- ^ List of input strings
-             -> (String, [String]) -- ^ Encoding string,
-                                   -- encoded messages
+             -> (String, [String]) -- ^ Encoding string and
+                                   -- the encoded messages
 readTestCase (x:lx) = (x, lx)
 readTestCase _ =  error "The input must be more than one line."
 
--- | maps the provided encoding to all messages
+-- | Maps the provided encoding to all messages
 showResult :: (String, [String]) -- ^ Encoding string and
                                  -- the encoded messages
            -> [String]           -- ^ List of decoded messages
@@ -28,7 +28,7 @@ showResult (encoding, messages) =
     map (decodeMessage encodingTree) messages
     where (_, encodingTree) =  (encodeTree encoding)
 
--- | constructs the encoding tree from encoding string
+-- | Constructs the encoding tree from encoding string
 -- parses encoding tree recursively for on left and right
 -- string but only passes to the left branch the unparsed
 -- part of by right branch, to pass the state to left
@@ -42,7 +42,7 @@ encodeTree ('*':encoding) =
 encodeTree (encoding)  = (encoding, Leaf (head encoding))
 
 
--- | traverses the encoded string with the the encoding tree
+-- | Traverses the encoded string with the the encoding tree
 -- until it reaches a leaf. Returns the leaf (decoded char)
 -- and the remaining encoded string that was not part of the
 -- path. Also rises an error when there is encoding symbols
@@ -58,7 +58,7 @@ decodeChar ('1':xb) (Branch _ right) = decodeChar xb right
 decodeChar _  _ = error "Either the message or \
                             \the encoding is corrupted."
 
--- | recursively calls 'decodeChar' until nothing of encoded
+-- | Recursively calls 'decodeChar' until nothing of encoded
 -- message is left.
 decodeMessage :: Tree     -- ^ Encoding tree
                 -> String -- ^ Encoded message
