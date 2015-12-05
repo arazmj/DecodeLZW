@@ -5,51 +5,57 @@
  - Project: Proj3, Decoding Text
  -}
 
--- | The tree structure on holds chars on leaves.
-data Tree = Leaf Char | Branch Tree Tree
+-- | The 'Tree' structure holds chars on leaves, and branche
+-- s otherwise
+data Node = Leaf Char | Branch Node Node
 
 main :: IO ()
 main = interact (unlines . showResult . readTestCase . lines)
 
--- | Seperates the first line (encoding string ) from the rest
--- of lines (encoded messages). Rises an error if there is no
--- more than a line.
+-- | Seperates the first line (encoding string) from the rest
+-- of lines (encoded messages).
+-- Rises an error if there is not more than a line.
 readTestCase :: [String]           -- ^ List of input strings
              -> (String, [String]) -- ^ Encoding string and
                                    -- the encoded messages
 readTestCase (x:lx) = (x, lx)
 readTestCase _ =  error "The input must be more than one line."
 
--- | Maps the provided encoding to all messages
+-- | Maps the provided 'encoding' to a list of
+-- binary 'messages'
 showResult :: (String, [String]) -- ^ Encoding string and
                                  -- the encoded messages
            -> [String]           -- ^ List of decoded messages
 showResult (encoding, messages) =
     map (decodeMessage encodingTree) messages
-    where (_, encodingTree) =  (encodeTree encoding)
+    where (_, encodingTree) =  encodeTree (encoding)
 
--- | Constructs the encoding tree from encoding string
--- parses encoding tree recursively for on left and right
--- string but only passes to the left branch the unparsed
--- part of by right branch, to pass the state to left
--- branch.
+-- | Constructs the encoding tree from the encoding string
+-- parses the 'encoding' recursively on left and right branches
+-- and passes the 'encodingLeft' to the left branch as unparsed
+-- part of by right branch in order to keep states between
+-- recursive calls.
+-- The returning value has an empty string as its first
+-- element 'encodingRight' and the root of the tree as its
+-- second parameter.
 encodeTree :: String         -- ^ Encoding string
-           -> (String, Tree) -- ^ Root of encoding tree node
+           -> (String, Node) -- ^ An empty String,
+                             -- root of encoding tree node
 encodeTree ('*':encoding) =
     let (encodingLeft, left)   = encodeTree encoding
         (encodingRight, right) = encodeTree (tail encodingLeft)
     in (encodingRight, Branch left right)
 encodeTree (encoding)  = (encoding, Leaf (head encoding))
 
-
 -- | Traverses the encoded string with the the encoding tree
 -- until it reaches a leaf. Returns the leaf (decoded char)
 -- and the remaining encoded string that was not part of the
--- path. Also rises an error when there is encoding symbols
+-- path.
+-- Rises an error when there is encoding symbols
 -- other than 0 or 1 or there is part of the encoded message
 -- left that cannot be decoded any further.
 decodeChar :: String         -- ^ Encoded message
-           -> Tree           -- ^ Encoding tree
+           -> Node           -- ^ Encoding tree
            -> (Char, String) -- ^ The decoded char and the
                              -- ^ encoded string remaining
 decodeChar rest     (Leaf c)         = (c, rest)
@@ -60,7 +66,7 @@ decodeChar _  _ = error "Either the message or \
 
 -- | Recursively calls 'decodeChar' until nothing of encoded
 -- message is left.
-decodeMessage :: Tree     -- ^ Encoding tree
+decodeMessage :: Node     -- ^ Encoding tree
                 -> String -- ^ Encoded message
                 -> String -- ^ Decoded message
 decodeMessage _ [] = []
