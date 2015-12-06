@@ -9,15 +9,17 @@
 data Tree = Leaf Char | Branch Tree Tree
 
 main :: IO ()
-main = interact (unlines . showResult . lines)
+main = interact (unlines . showResults . lines)
 
 -- | Maps the provided 'encoding' to a list of
 -- binary 'messages'
-showResult :: [String] -- ^ Input lines
-           -> [String] -- ^ List of decoded messages
-showResult  messages =
-    map (decodeMessage encodingTree) (tail messages)
-    where (_, encodingTree) =  encodeTree (head messages)
+showResults :: [String] -- ^ Input lines
+            -> [String] -- ^ List of decoded messages
+showResults  messages =
+    map (fst . decode) (tail messages)
+    where (_, encodingTree) = encodeTree (head messages)
+          decode message    = until (null . snd)
+                 (decodeChar encodingTree) ([], message)
 
 -- | Constructs the encoding tree from the encoding string
 -- parses the 'encoding' recursively on left and right branches
@@ -43,22 +45,11 @@ encodeTree (encoding)  = (encoding, Leaf (head encoding))
 -- Rises an error when there is encoding symbols
 -- other than 0 or 1 or there is part of the encoded message
 -- left that cannot be decoded any further.
-decodeChar :: String         -- ^ Encoded message
-           -> Tree           -- ^ Encoding tree
-           -> (Char, String) -- ^ The decoded char and the
-                             -- ^ encoded string remaining
-decodeChar rest     (Leaf c)         = (c, rest)
-decodeChar ('0':xb) (Branch left _)  = decodeChar xb left
-decodeChar ('1':xb) (Branch _ right) = decodeChar xb right
-decodeChar _  _ = error "Either the message or \
-                            \the encoding is corrupted."
-
--- | Recursively calls 'decodeChar' until nothing of
--- encoded message is left.
-decodeMessage :: Tree     -- ^ Encoding tree
-                -> String -- ^ Encoded message
-                -> String -- ^ Decoded message
-decodeMessage _ [] = []
-decodeMessage tree message =
-    let (c, rest) = decodeChar message tree
-    in c:decodeMessage tree rest
+decodeChar :: Tree              -- ^ Encoding tree
+           -> (String, String)  -- ^ Encoded message
+           -> (String, String)  -- ^ The tuple of so far decoded
+                                -- the remaining of the message
+decodeChar (Leaf c)         (l, rest)     = (l ++ [c], rest)
+decodeChar (Branch left _)  (l, ('0':xb)) = decodeChar left  (l, xb)
+decodeChar (Branch _ right) (l, ('1':xb)) = decodeChar right (l, xb)
+decodeChar _  _ = error "Either the message or the encoding is corrupted."
