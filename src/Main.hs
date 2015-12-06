@@ -5,30 +5,19 @@
  - Project: Proj3, Decoding Text
  -}
 
--- | The 'Tree' structure holds chars on leaves, and branche
--- s otherwise
-data Node = Leaf Char | Branch Node Node
+-- | The 'Tree' structure.
+data Tree = Leaf Char | Branch Tree Tree
 
 main :: IO ()
-main = interact (unlines . showResult . readTestCase . lines)
-
--- | Seperates the first line (encoding string) from the rest
--- of lines (encoded messages).
--- Rises an error if there is not more than a line.
-readTestCase :: [String]           -- ^ List of input strings
-             -> (String, [String]) -- ^ Encoding string and
-                                   -- the encoded messages
-readTestCase (x:lx) = (x, lx)
-readTestCase _ =  error "The input must be more than one line."
+main = interact (unlines . showResult . lines)
 
 -- | Maps the provided 'encoding' to a list of
 -- binary 'messages'
-showResult :: (String, [String]) -- ^ Encoding string and
-                                 -- the encoded messages
-           -> [String]           -- ^ List of decoded messages
-showResult (encoding, messages) =
-    map (decodeMessage encodingTree) messages
-    where (_, encodingTree) =  encodeTree (encoding)
+showResult :: [String] -- ^ Input lines
+           -> [String] -- ^ List of decoded messages
+showResult  messages =
+    map (decodeMessage encodingTree) (tail messages)
+    where (_, encodingTree) =  encodeTree (head messages)
 
 -- | Constructs the encoding tree from the encoding string
 -- parses the 'encoding' recursively on left and right branches
@@ -39,8 +28,8 @@ showResult (encoding, messages) =
 -- element 'encodingRight' and the root of the tree as its
 -- second parameter.
 encodeTree :: String         -- ^ Encoding string
-           -> (String, Node) -- ^ An empty String,
-                             -- root of encoding tree node
+           -> (String, Tree) -- ^ An empty String and the
+                             -- root of the encoding tree
 encodeTree ('*':encoding) =
     let (encodingLeft, left)   = encodeTree encoding
         (encodingRight, right) = encodeTree (tail encodingLeft)
@@ -55,7 +44,7 @@ encodeTree (encoding)  = (encoding, Leaf (head encoding))
 -- other than 0 or 1 or there is part of the encoded message
 -- left that cannot be decoded any further.
 decodeChar :: String         -- ^ Encoded message
-           -> Node           -- ^ Encoding tree
+           -> Tree           -- ^ Encoding tree
            -> (Char, String) -- ^ The decoded char and the
                              -- ^ encoded string remaining
 decodeChar rest     (Leaf c)         = (c, rest)
@@ -64,9 +53,9 @@ decodeChar ('1':xb) (Branch _ right) = decodeChar xb right
 decodeChar _  _ = error "Either the message or \
                             \the encoding is corrupted."
 
--- | Recursively calls 'decodeChar' until nothing of encoded
--- message is left.
-decodeMessage :: Node     -- ^ Encoding tree
+-- | Recursively calls 'decodeChar' until nothing of
+-- encoded message is left.
+decodeMessage :: Tree     -- ^ Encoding tree
                 -> String -- ^ Encoded message
                 -> String -- ^ Decoded message
 decodeMessage _ [] = []
