@@ -1,10 +1,19 @@
 name:              DecodingText
 version:           1.0
 Build-Type:        Simple
-cabal-version:     >= 1.2
+cabal-version:     >= 1.10
 
 executable DecodingText
   main-is:         Main.hs
   hs-source-dirs:  src
   other-modules:   Huffman, LZW
   build-depends:   base, containers
+  default-language: Haskell2010
+
+test-suite roundtrip
+  type:            exitcode-stdio-1.0
+  main-is:         Spec.hs
+  hs-source-dirs:  test, src
+  other-modules:   Huffman, LZW
+  build-depends:   base, containers
+  default-language: Haskell2010
