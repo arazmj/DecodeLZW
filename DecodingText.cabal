@@ -6,5 +6,5 @@ cabal-version:     >= 1.2
 executable DecodingText
   main-is:         Main.hs
   hs-source-dirs:  src
-  other-modules:   Huffman
-  build-depends:   base
+  other-modules:   Huffman, LZW
+  build-depends:   base, containers
